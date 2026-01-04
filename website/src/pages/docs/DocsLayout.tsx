@@ -11,11 +11,18 @@ interface DocsLayoutProps {
   description?: string;
 }
 
+interface DocPage {
+  href: string;
+  label: string;
+}
+
 export function DocsLayout({ children, title, description }: DocsLayoutProps) {
   const location = useLocation();
 
   // Find current page index for prev/next navigation
-  const allPages = DOCS_SIDEBAR.flatMap((section) => section.items);
+  const allPages: DocPage[] = DOCS_SIDEBAR.flatMap((section) =>
+    section.items.map((item) => ({ href: item.href, label: item.label }))
+  );
   const currentIndex = allPages.findIndex((item) => item.href === location.pathname);
   const prevPage = currentIndex > 0 ? allPages[currentIndex - 1] : null;
   const nextPage = currentIndex < allPages.length - 1 ? allPages[currentIndex + 1] : null;

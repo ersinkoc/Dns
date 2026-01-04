@@ -1,5 +1,4 @@
 import { CodeBlock } from '@/components/code/CodeBlock';
-import { cn } from '@/lib/utils';
 
 const API_SECTIONS = [
   {

@@ -10,12 +10,12 @@ export function Header() {
   const location = useLocation();
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <header className="sticky top-0 z-50 w-full border-b border-zinc-800/60 bg-zinc-950/80 backdrop-blur-xl">
       <div className="container mx-auto flex h-16 max-w-screen-2xl items-center justify-between px-4">
         {/* Logo */}
         <Link to="/" className="flex items-center gap-2">
-          <Globe className="h-7 w-7 text-primary" />
-          <span className="text-lg font-bold">{PACKAGE_NAME}</span>
+          <Globe className="h-7 w-7 text-indigo-400" />
+          <span className="text-lg font-bold text-zinc-100">{PACKAGE_NAME}</span>
         </Link>
 
         {/* Desktop Navigation */}
@@ -25,10 +25,10 @@ export function Header() {
               key={link.href}
               to={link.href}
               className={cn(
-                'font-medium transition-colors hover:text-foreground',
+                'font-medium transition-colors hover:text-zinc-100',
                 location.pathname === link.href || location.pathname.startsWith(link.href + '/')
-                  ? 'text-foreground'
-                  : 'text-muted-foreground'
+                  ? 'text-zinc-100'
+                  : 'text-zinc-400'
               )}
             >
               {link.label}
@@ -43,7 +43,7 @@ export function Header() {
             href={`https://github.com/${GITHUB_REPO}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg border border-border hover:bg-accent transition-colors"
+            className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg border border-zinc-700 hover:border-zinc-600 hover:bg-zinc-800/50 text-zinc-300 transition-colors"
           >
             <Star className="h-4 w-4" />
             <span className="text-sm font-medium">Star</span>
@@ -54,7 +54,7 @@ export function Header() {
             href={`https://www.npmjs.com/package/${NPM_PACKAGE}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="hidden sm:flex p-2 rounded-lg hover:bg-accent transition-colors"
+            className="hidden sm:flex p-2 rounded-lg hover:bg-zinc-800/50 text-zinc-400 hover:text-zinc-200 transition-colors"
             aria-label="View on npm"
           >
             <Package className="h-5 w-5" />
@@ -65,7 +65,7 @@ export function Header() {
             href={`https://github.com/${GITHUB_REPO}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="p-2 rounded-lg hover:bg-accent transition-colors"
+            className="p-2 rounded-lg hover:bg-zinc-800/50 text-zinc-400 hover:text-zinc-200 transition-colors"
             aria-label="View on GitHub"
           >
             <Github className="h-5 w-5" />
@@ -76,7 +76,7 @@ export function Header() {
 
           {/* Mobile menu button */}
           <button
-            className="md:hidden p-2 rounded-lg hover:bg-accent transition-colors"
+            className="md:hidden p-2 rounded-lg hover:bg-zinc-800/50 text-zinc-400 transition-colors"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
           >
@@ -91,7 +91,7 @@ export function Header() {
 
       {/* Mobile Navigation */}
       {mobileMenuOpen && (
-        <div className="md:hidden border-t border-border bg-background">
+        <div className="md:hidden border-t border-zinc-800 bg-zinc-950">
           <nav className="container mx-auto px-4 py-4 flex flex-col gap-2">
             {NAV_LINKS.map((link) => (
               <Link
@@ -101,8 +101,8 @@ export function Header() {
                 className={cn(
                   'px-4 py-2 rounded-lg font-medium transition-colors',
                   location.pathname === link.href || location.pathname.startsWith(link.href + '/')
-                    ? 'bg-accent text-foreground'
-                    : 'text-muted-foreground hover:bg-accent hover:text-foreground'
+                    ? 'bg-zinc-800 text-zinc-100'
+                    : 'text-zinc-400 hover:bg-zinc-800/50 hover:text-zinc-200'
                 )}
               >
                 {link.label}

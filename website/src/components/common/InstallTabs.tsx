@@ -33,12 +33,12 @@ export function InstallTabs({ className }: InstallTabsProps) {
   return (
     <div
       className={cn(
-        'rounded-xl overflow-hidden border border-border bg-card',
+        'rounded-xl overflow-hidden border border-zinc-800/60 bg-zinc-900/60 backdrop-blur-sm',
         className
       )}
     >
       {/* Tabs */}
-      <div className="flex border-b border-border bg-muted/50">
+      <div className="flex border-b border-zinc-800/60 bg-zinc-900/40">
         {TABS.map((tab) => (
           <button
             key={tab.id}
@@ -46,8 +46,8 @@ export function InstallTabs({ className }: InstallTabsProps) {
             className={cn(
               'px-4 py-2.5 text-sm font-medium transition-colors',
               activeTab === tab.id
-                ? 'text-foreground bg-background border-b-2 border-primary -mb-px'
-                : 'text-muted-foreground hover:text-foreground'
+                ? 'text-zinc-100 bg-zinc-800/50 border-b-2 border-indigo-500 -mb-px'
+                : 'text-zinc-500 hover:text-zinc-300'
             )}
           >
             {tab.label}
@@ -57,18 +57,18 @@ export function InstallTabs({ className }: InstallTabsProps) {
 
       {/* Command */}
       <div className="flex items-center justify-between p-4">
-        <code className="text-sm font-mono text-foreground">{command}</code>
+        <code className="text-sm font-mono text-zinc-200">{command}</code>
         <button
           onClick={() => copy(command)}
           className={cn(
             'flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm',
-            'text-muted-foreground hover:text-foreground',
-            'hover:bg-accent transition-colors'
+            'text-zinc-500 hover:text-zinc-200',
+            'hover:bg-zinc-800/50 transition-colors'
           )}
           aria-label="Copy command"
         >
           {copied ? (
-            <Check className="w-4 h-4 text-green-500" />
+            <Check className="w-4 h-4 text-green-400" />
           ) : (
             <Copy className="w-4 h-4" />
           )}
