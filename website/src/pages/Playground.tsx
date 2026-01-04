@@ -18,7 +18,7 @@ export function Playground() {
       // For the playground, we'll simulate the response
       await new Promise((resolve) => setTimeout(resolve, 500));
 
-      const responses: Record<string, string[]> = {
+      const responses: Record<string, Record<'A' | 'AAAA' | 'MX' | 'TXT' | 'CNAME' | 'NS', string[]>> = {
         'example.com': {
           'A': ['93.184.216.34'],
           'AAAA': ['2606:2800:220:1:248:1893:25c8:1946'],

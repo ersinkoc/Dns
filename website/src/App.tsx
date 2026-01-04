@@ -32,9 +32,9 @@ function App() {
   return (
     <div className={`min-h-screen ${theme === 'dark' ? 'dark' : 'light'}`}>
       <div className="flex min-h-screen flex-col bg-background text-foreground">
-        <Navbar currentPage={page} onPageChange={setPage} onThemeToggle={() => setTheme(theme === 'dark' ? 'light' : 'dark')} theme={theme} />
+        <Navbar currentPage={page} onPageChange={(p) => setPage(p as Page)} onThemeToggle={() => setTheme(theme === 'dark' ? 'light' : 'dark')} theme={theme} />
         <main className="flex-1">
-          {page === 'home' && <Home onPageChange={setPage} />}
+          {page === 'home' && <Home onPageChange={(p) => setPage(p as Page)} />}
           {page === 'getting-started' && <GettingStarted />}
           {page === 'api' && <ApiReference />}
           {page === 'examples' && <Examples />}
