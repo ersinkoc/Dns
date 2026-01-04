@@ -1,84 +1,230 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
-@layer base {
-  :root {
-    --background: 220 10% 8%;
-    --foreground: 210 20% 95%;
-    --card: 220 15% 12%;
-    --card-foreground: 210 20% 95%;
-    --border: 220 15% 18%;
-    --primary: 210 100% 65%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 220 15% 18%;
-    --muted: 220 15% 18%;
-    --accent: 220 15% 20%;
-  }
+@theme inline {
+  /* Fonts */
+  --font-sans: 'Inter', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
 
-  .light {
-    --background: 0 0% 100%;
-    --foreground: 220 10% 8%;
-    --card: 0 0% 100%;
-    --card-foreground: 220 10% 8%;
-    --border: 220 15% 90%;
-    --primary: 210 100% 50%;
-    --secondary: 220 15% 95%;
-    --muted: 220 15% 95%;
-    --accent: 220 15% 92%;
-  }
+  /* Colors - these create utility classes like bg-primary, text-muted-foreground etc */
+  --color-background: #ffffff;
+  --color-foreground: #0a0a0a;
+  --color-card: #ffffff;
+  --color-card-foreground: #0a0a0a;
+  --color-popover: #ffffff;
+  --color-popover-foreground: #0a0a0a;
+  --color-primary: #0080ff;
+  --color-primary-foreground: #fafafa;
+  --color-secondary: #f5f5f5;
+  --color-secondary-foreground: #171717;
+  --color-muted: #f5f5f5;
+  --color-muted-foreground: #737373;
+  --color-accent: #f5f5f5;
+  --color-accent-foreground: #171717;
+  --color-destructive: #ef4444;
+  --color-destructive-foreground: #fafafa;
+  --color-border: #e5e5e5;
+  --color-input: #e5e5e5;
+  --color-ring: #0080ff;
+
+  /* Radius */
+  --radius-sm: 0.5rem;
+  --radius-md: 0.75rem;
+  --radius-lg: 1rem;
+  --radius-xl: 1.5rem;
+}
+
+/* Dark mode colors - override via CSS custom properties */
+.dark {
+  --color-background: #0c1222;
+  --color-foreground: #f8fafc;
+  --color-card: #0f172a;
+  --color-card-foreground: #f8fafc;
+  --color-popover: #0f172a;
+  --color-popover-foreground: #f8fafc;
+  --color-primary: #3b82f6;
+  --color-primary-foreground: #fafafa;
+  --color-secondary: #1e293b;
+  --color-secondary-foreground: #f8fafc;
+  --color-muted: #1e293b;
+  --color-muted-foreground: #94a3b8;
+  --color-accent: #1e293b;
+  --color-accent-foreground: #f8fafc;
+  --color-destructive: #7f1d1d;
+  --color-destructive-foreground: #fafafa;
+  --color-border: #1e293b;
+  --color-input: #1e293b;
+  --color-ring: #3b82f6;
 }
 
 @layer base {
   * {
-    @apply border-border;
+    border-color: var(--color-border);
   }
 
   body {
-    @apply bg-background text-foreground;
-    font-feature-settings: "rlig" 1, "calt" 1;
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  code, pre, kbd {
+    font-family: var(--font-mono);
+  }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: var(--color-border);
+    border-radius: 9999px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--color-muted-foreground);
   }
 }
 
-/* IDE-style code blocks */
-.code-block {
-  @apply relative my-4 overflow-hidden rounded-lg border border-border bg-accent;
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
 
-.code-header {
-  @apply flex items-center justify-between border-b border-border px-4 py-2 text-sm text-muted-foreground;
+/* Gradient background animation */
+@keyframes gradient-shift {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
 }
 
-.code-content {
-  @apply overflow-x-auto p-4 text-sm;
+.animate-gradient {
+  background-size: 200% 200%;
+  animation: gradient-shift 15s ease infinite;
 }
 
-.code-content pre {
-  @apply m-0;
+/* Glow effect */
+.glow {
+  box-shadow: 0 0 40px -10px var(--color-primary);
 }
 
-.code-content code {
-  @apply font-mono;
+/* Focus styles */
+*:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--color-background), 0 0 0 4px var(--color-ring);
 }
 
-.line-numbers {
-  @apply mr-4 select-none text-muted-foreground/50;
+/* Skip to content */
+.skip-to-content {
+  position: absolute;
+  left: -9999px;
+  z-index: 999;
+  padding: 0.5rem 1rem;
+  background: var(--color-primary);
+  color: var(--color-primary-foreground);
+  border-radius: var(--radius-md);
 }
 
-/* Copy button */
-.copy-button {
-  @apply rounded px-2 py-1 text-xs font-medium transition-colors;
-  @apply hover:bg-primary/10 hover:text-primary;
-  @call active:scale-95;
+.skip-to-content:focus {
+  left: 1rem;
+  top: 1rem;
 }
 
-/* Theme toggle */
-.theme-toggle {
-  @apply rounded-full p-2 transition-colors;
-  @apply hover:bg-accent;
+/* @oxog/codeshine code block fixes */
+.codeshine-block {
+  display: block !important;
+  overflow-x: auto;
 }
 
-/* Footer links */
-.footer-link {
-  @apply text-muted-foreground transition-colors hover:text-foreground;
+/* Codeshine wrapper pre.cs-codeblock */
+.codeshine-block .cs-codeblock,
+.codeshine-block pre {
+  display: block !important;
+  margin: 0 !important;
+  padding: 1rem !important;
+  overflow-x: auto;
+  border-radius: 0 !important;
+}
+
+/* Codeshine code element */
+.codeshine-block .cs-code,
+.codeshine-block code {
+  display: block !important;
+  white-space: pre !important;
+  word-wrap: normal !important;
+  overflow-wrap: normal !important;
+  font-family: var(--font-mono) !important;
+  font-size: 0.875rem !important;
+  line-height: 1.7 !important;
+}
+
+/* Force each line span to be a block element */
+.codeshine-block .cs-code > span,
+.codeshine-block code > span {
+  display: block !important;
+  min-height: 1.5em;
+}
+
+/* Line number styling */
+.codeshine-block .cs-line-number {
+  display: inline-block !important;
+  min-width: 3em;
+  text-align: right;
+  padding-right: 1em;
+  margin-right: 0.5em;
+  color: var(--color-muted-foreground) !important;
+  opacity: 0.5;
+  user-select: none;
+}
+
+/* Highlighted line */
+.codeshine-block .cs-line-highlighted {
+  background: rgba(59, 130, 246, 0.15) !important;
+  margin: 0 -1rem;
+  padding: 0 1rem;
+}
+
+/* Focused line */
+.codeshine-block .cs-line-focused {
+  background: rgba(59, 130, 246, 0.1);
+}
+
+/* Dimmed line */
+.codeshine-block .cs-line-dimmed {
+  opacity: 0.4;
+}
+
+/* Dark mode hero enhancements */
+.dark .hero-gradient {
+  background: radial-gradient(ellipse 80% 50% at 50% -20%, rgba(59, 130, 246, 0.3), transparent);
+}
+
+/* Dark mode card improvements */
+.dark .feature-card {
+  background: linear-gradient(to bottom right, rgba(30, 41, 59, 0.8), rgba(15, 23, 42, 0.9));
+  border-color: rgba(59, 130, 246, 0.2);
+}
+
+.dark .feature-card:hover {
+  border-color: rgba(59, 130, 246, 0.4);
+  background: linear-gradient(to bottom right, rgba(30, 41, 59, 0.9), rgba(15, 23, 42, 1));
+}
+
+/* Stats section dark mode */
+.dark .stats-section {
+  background: linear-gradient(to right, rgba(15, 23, 42, 0.8), rgba(30, 41, 59, 0.5), rgba(15, 23, 42, 0.8));
 }

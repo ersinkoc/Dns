@@ -1,50 +1,43 @@
-import { useState, useEffect } from 'react';
-import { Navbar } from './components/Navbar';
-import { Home } from './pages/Home';
-import { GettingStarted } from './pages/GettingStarted';
-import { ApiReference } from './pages/ApiReference';
-import { Examples } from './pages/Examples';
-import { Plugins } from './pages/Plugins';
-import { Playground } from './pages/Playground';
-import { Footer } from './components/Footer';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { Layout } from '@/components/layout/Layout';
+import { Home } from '@/pages/Home';
+import { Introduction } from '@/pages/docs/Introduction';
+import { Installation } from '@/pages/docs/Installation';
+import { QuickStart } from '@/pages/docs/QuickStart';
+import { ApiReference } from '@/pages/ApiReference';
+import { Examples } from '@/pages/Examples';
+import { Plugins } from '@/pages/Plugins';
+import { Playground } from '@/pages/Playground';
 
-type Page = 'home' | 'getting-started' | 'api' | 'examples' | 'plugins' | 'playground';
-
-function App() {
-  const [page, setPage] = useState<Page>('home');
-  const [theme, setTheme] = useState<'dark' | 'light'>('dark');
-
-  useEffect(() => {
-    const stored = localStorage.getItem('theme') as 'dark' | 'light' | null;
-    if (stored) {
-      setTheme(stored);
-    } else if (window.matchMedia('(prefers-color-scheme: light)').matches) {
-      setTheme('light');
-    }
-  }, []);
-
-  useEffect(() => {
-    localStorage.setItem('theme', theme);
-    document.documentElement.classList.toggle('dark', theme === 'dark');
-    document.documentElement.classList.toggle('light', theme === 'light');
-  }, [theme]);
-
+export function App() {
   return (
-    <div className={`min-h-screen ${theme === 'dark' ? 'dark' : 'light'}`}>
-      <div className="flex min-h-screen flex-col bg-background text-foreground">
-        <Navbar currentPage={page} onPageChange={(p) => setPage(p as Page)} onThemeToggle={() => setTheme(theme === 'dark' ? 'light' : 'dark')} theme={theme} />
-        <main className="flex-1">
-          {page === 'home' && <Home onPageChange={(p) => setPage(p as Page)} />}
-          {page === 'getting-started' && <GettingStarted />}
-          {page === 'api' && <ApiReference />}
-          {page === 'examples' && <Examples />}
-          {page === 'plugins' && <Plugins />}
-          {page === 'playground' && <Playground />}
-        </main>
-        <Footer />
-      </div>
-    </div>
+    <BrowserRouter>
+      <Layout>
+        <Routes>
+          {/* Home */}
+          <Route path="/" element={<Home />} />
+
+          {/* Docs */}
+          <Route path="/docs" element={<Introduction />} />
+          <Route path="/docs/installation" element={<Installation />} />
+          <Route path="/docs/quick-start" element={<QuickStart />} />
+
+          {/* API */}
+          <Route path="/api" element={<ApiReference />} />
+
+          {/* Examples */}
+          <Route path="/examples" element={<Examples />} />
+
+          {/* Plugins */}
+          <Route path="/plugins" element={<Plugins />} />
+
+          {/* Playground */}
+          <Route path="/playground" element={<Playground />} />
+
+          {/* 404 - redirect to home */}
+          <Route path="*" element={<Home />} />
+        </Routes>
+      </Layout>
+    </BrowserRouter>
   );
 }
-
-export { App };

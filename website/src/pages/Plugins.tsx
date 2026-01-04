@@ -1,244 +1,287 @@
-import { CodeBlock } from '../components/CodeBlock';
+import { Puzzle, Check, Plug } from 'lucide-react';
+import { CodeBlock } from '@/components/code/CodeBlock';
+import { cn } from '@/lib/utils';
 
-export function Plugins() {
-  return (
-    <div className="mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:px-8">
-      <h1 className="text-3xl font-bold">Plugins</h1>
-      <p className="mt-2 text-muted-foreground">
-        @oxog/dns uses a micro-kernel architecture with a plugin system for extensibility.
-      </p>
-
-      <div className="mt-8 space-y-12">
-        {/* Core Plugins */}
-        <section>
-          <h2 className="text-2xl font-semibold">Core Plugins</h2>
-          <p className="mt-2 text-muted-foreground">
-            These plugins are automatically loaded by the resolver.
-          </p>
-
-          <div className="mt-6 space-y-6">
-            <div>
-              <h3 className="mb-2 text-lg font-semibold">record-parser</h3>
-              <p className="mb-4 text-sm text-muted-foreground">
-                Parses DNS wire format responses into structured data.
-              </p>
-              <CodeBlock filename="record-parser.ts" language="typescript">
-                {`import { recordParserPlugin } from '@oxog/dns/plugins';
+const CORE_PLUGINS = [
+  {
+    name: 'record-parser',
+    description: 'Parses DNS wire format responses into structured data.',
+    code: `import { recordParserPlugin } from '@oxog/dns/plugins';
 
 const kernel = createKernel();
-kernel.use(recordParserPlugin);`}
-              </CodeBlock>
-            </div>
-
-            <div>
-              <h3 className="mb-2 text-lg font-semibold">resolver-chain</h3>
-              <p className="mb-4 text-sm text-muted-foreground">
-                Manages resolver selection and failover logic.
-              </p>
-              <CodeBlock filename="resolver-chain.ts" language="typescript">
-                {`import { resolverChainPlugin } from '@oxog/dns/plugins';
+kernel.use(recordParserPlugin);`,
+  },
+  {
+    name: 'resolver-chain',
+    description: 'Manages resolver selection and failover logic.',
+    code: `import { resolverChainPlugin } from '@oxog/dns/plugins';
 
 const kernel = createKernel({
   servers: ['8.8.8.8', '1.1.1.1'],
   rotationStrategy: 'failover'
 });
 
-kernel.use(resolverChainPlugin);
-
-// Get next resolver
-import { getNextResolver } from '@oxog/dns/plugins';
-const server = getNextResolver(kernel);`}
-              </CodeBlock>
-            </div>
-
-            <div>
-              <h3 className="mb-2 text-lg font-semibold">query-builder</h3>
-              <p className="mb-4 text-sm text-muted-foreground">
-                Builds DNS queries in wire format.
-              </p>
-              <CodeBlock filename="query-builder.ts" language="typescript">
-                {`import { queryBuilderPlugin } from '@oxog/dns/plugins';
+kernel.use(resolverChainPlugin);`,
+  },
+  {
+    name: 'query-builder',
+    description: 'Builds DNS queries in wire format.',
+    code: `import { queryBuilderPlugin } from '@oxog/dns/plugins';
 
 const kernel = createKernel();
-kernel.use(queryBuilderPlugin);
+kernel.use(queryBuilderPlugin);`,
+  },
+];
 
-// Build query
-import { buildQueryWithKernel } from '@oxog/dns/plugins';
-const [queryId, buffer] = buildQueryWithKernel(kernel, 'example.com', 'A');`}
-              </CodeBlock>
-            </div>
-          </div>
-        </section>
+const OPTIONAL_PLUGINS = [
+  {
+    name: 'cache',
+    description: 'TTL-aware response caching with LRU eviction.',
+    code: `import { cachePlugin } from '@oxog/dns/plugins';
 
-        {/* Optional Plugins */}
-        <section>
-          <h2 className="text-2xl font-semibold">Optional Plugins</h2>
-          <p className="mt-2 text-muted-foreground">
-            These plugins can be enabled as needed.
-          </p>
+const kernel = createKernel({
+  cache: { enabled: true, maxSize: 1000 }
+});
 
-          <div className="mt-6 space-y-6">
-            <div>
-              <h3 className="mb-2 text-lg font-semibold">cache</h3>
-              <p className="mb-4 text-sm text-muted-foreground">
-                TTL-aware response caching with LRU eviction.
-              </p>
-              <CodeBlock filename="cache.ts" language="typescript">
-                {`import { cachePlugin } from '@oxog/dns/plugins';
-
-const kernel = createKernel();
 kernel.use(cachePlugin);
 
-// Use cache
-import { cacheGet, cacheSet } from '@oxog/dns/plugins';
-cacheSet(kernel, 'example.com:A', records, 3600);
-const cached = cacheGet(kernel, 'example.com:A');`}
-              </CodeBlock>
-            </div>
+// Check cache stats
+const stats = kernel.getCacheStats();`,
+  },
+  {
+    name: 'doh',
+    description: 'DNS-over-HTTPS transport layer.',
+    code: `import { dohPlugin } from '@oxog/dns/plugins';
 
-            <div>
-              <h3 className="mb-2 text-lg font-semibold">doh</h3>
-              <p className="mb-4 text-sm text-muted-foreground">
-                DNS-over-HTTPS transport layer.
-              </p>
-              <CodeBlock filename="doh.ts" language="typescript">
-                {`import { dohPlugin } from '@oxog/dns/plugins';
+const kernel = createKernel({
+  type: 'doh',
+  server: 'https://1.1.1.1/dns-query'
+});
 
-const kernel = createKernel({ type: 'doh' });
-kernel.use(dohPlugin);
-
-// Execute DoH query
-import { dohQuery } from '@oxog/dns/plugins';
-const buffer = await dohQuery(kernel, queryBuffer);`}
-              </CodeBlock>
-            </div>
-
-            <div>
-              <h3 className="mb-2 text-lg font-semibold">dnssec</h3>
-              <p className="mb-4 text-sm text-muted-foreground">
-                DNSSEC signature validation.
-              </p>
-              <CodeBlock filename="dnssec.ts" language="typescript">
-                {`import { dnssecPlugin } from '@oxog/dns/plugins';
+kernel.use(dohPlugin);`,
+  },
+  {
+    name: 'dnssec',
+    description: 'DNSSEC signature validation.',
+    code: `import { dnssecPlugin } from '@oxog/dns/plugins';
 
 const kernel = createKernel({
   dnssec: { enabled: true, requireValid: true }
 });
 
-kernel.use(dnssecPlugin);
-
-// Validate DNSSEC
-import { validateDnssec } from '@oxog/dns/plugins';
-const result = await validateDnssec(kernel, 'example.com');`}
-              </CodeBlock>
-            </div>
-
-            <div>
-              <h3 className="mb-2 text-lg font-semibold">retry</h3>
-              <p className="mb-4 text-sm text-muted-foreground">
-                Automatic retry with backoff strategies.
-              </p>
-              <CodeBlock filename="retry.ts" language="typescript">
-                {`import { retryPlugin } from '@oxog/dns/plugins';
+kernel.use(dnssecPlugin);`,
+  },
+  {
+    name: 'retry',
+    description: 'Automatic retry with backoff strategies.',
+    code: `import { retryPlugin } from '@oxog/dns/plugins';
 
 const kernel = createKernel({
   retries: 3,
+  retryDelay: 100,
   retryBackoff: 'exponential'
 });
 
-kernel.use(retryPlugin);
-
-// Execute with retry
-import { withRetry } from '@oxog/dns/plugins';
-const result = await withRetry(kernel, async () => {
-  return await fetch('https://example.com');
-});`}
-              </CodeBlock>
-            </div>
-
-            <div>
-              <h3 className="mb-2 text-lg font-semibold">metrics</h3>
-              <p className="mb-4 text-sm text-muted-foreground">
-                Query timing and statistics collection.
-              </p>
-              <CodeBlock filename="metrics.ts" language="typescript">
-                {`import { metricsPlugin } from '@oxog/dns/plugins';
+kernel.use(retryPlugin);`,
+  },
+  {
+    name: 'metrics',
+    description: 'Query timing and statistics collection.',
+    code: `import { metricsPlugin } from '@oxog/dns/plugins';
 
 const kernel = createKernel();
 kernel.use(metricsPlugin);
 
-// Record metric
-import { recordMetric } from '@oxog/dns/plugins';
-recordMetric(kernel, {
-  name: 'query-duration',
-  value: 45,
-  timestamp: Date.now()
-});
-
-// Get stats
-import { getMetricStats } from '@oxog/dns/plugins';
-const stats = getMetricStats(kernel, 'query-duration');`}
-              </CodeBlock>
-            </div>
-
-            <div>
-              <h3 className="mb-2 text-lg font-semibold">logger</h3>
-              <p className="mb-4 text-sm text-muted-foreground">
-                Query/response logging.
-              </p>
-              <CodeBlock filename="logger.ts" language="typescript">
-                {`import { loggerPlugin } from '@oxog/dns/plugins';
+// Get metrics
+kernel.on('metrics', (data) => {
+  console.log('Query duration:', data.duration);
+});`,
+  },
+  {
+    name: 'logger',
+    description: 'Query/response logging.',
+    code: `import { loggerPlugin } from '@oxog/dns/plugins';
 
 const kernel = createKernel();
 kernel.use(loggerPlugin);
 
-// Log messages
-import { log, getLogs } from '@oxog/dns/plugins';
-log(kernel, 'info', 'Custom message', { key: 'value' });
-const logs = getLogs(kernel);`}
-              </CodeBlock>
-            </div>
-          </div>
-        </section>
+// Logs are emitted as events
+kernel.on('log', ({ level, message }) => {
+  console.log(\`[\${level}] \${message}\`);
+});`,
+  },
+];
 
-        {/* Custom Plugins */}
-        <section>
-          <h2 className="text-2xl font-semibold">Custom Plugins</h2>
-          <p className="mt-2 text-muted-foreground">
-            Create your own plugins to extend functionality.
-          </p>
-          <CodeBlock filename="custom-plugin.ts" language="typescript">
-            {`import type { DnsPlugin } from '@oxog/dns';
+const CUSTOM_PLUGIN_CODE = `import type { DnsPlugin, DnsKernel } from '@oxog/dns';
 
 const myPlugin: DnsPlugin = {
-  name: 'my-plugin',
+  name: 'my-custom-plugin',
   version: '1.0.0',
 
-  install(kernel) {
+  // Called when plugin is registered
+  install(kernel: DnsKernel) {
     // Register event listeners
     kernel.on('query', async (data) => {
-      console.log('Query:', data);
+      console.log('Query started:', data.domain, data.type);
     });
 
     kernel.on('response', async (data) => {
-      console.log('Response:', data);
+      console.log('Response received:', data.records);
+    });
+
+    kernel.on('error', async (error) => {
+      console.error('Query failed:', error.message);
     });
   },
 
+  // Called after all plugins are installed
   async onInit(context) {
-    // Initialize after all plugins installed
+    console.log('Plugin initialized');
   },
 
+  // Called when kernel is destroyed
   onDestroy() {
-    // Cleanup
+    console.log('Plugin cleanup');
   }
 };
 
 // Use the plugin
 const kernel = createKernel();
 kernel.use(myPlugin);
-await kernel.init();`}
-          </CodeBlock>
+await kernel.init();`;
+
+const LIFECYCLE_CODE = `// Plugin lifecycle diagram
+//
+// 1. install(kernel)  <- Register event handlers
+//       |
+//       v
+// 2. kernel.init()    <- System initialization
+//       |
+//       v
+// 3. onInit(context)  <- Plugin ready
+//       |
+//       v
+// 4. [queries...]     <- Normal operation
+//       |
+//       v
+// 5. kernel.destroy() <- Cleanup
+//       |
+//       v
+// 6. onDestroy()      <- Plugin cleanup`;
+
+export function Plugins() {
+  return (
+    <div className="container mx-auto px-4 py-12">
+      <div className="max-w-4xl mx-auto">
+        <header className="mb-12">
+          <h1 className="text-4xl font-bold mb-4">Plugins</h1>
+          <p className="text-lg text-muted-foreground">
+            @oxog/dns uses a micro-kernel architecture with a powerful plugin system for extensibility.
+          </p>
+        </header>
+
+        {/* Architecture overview */}
+        <section className="mb-16 p-6 rounded-xl border border-border bg-card">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="p-2 rounded-lg bg-primary/10">
+              <Puzzle className="w-5 h-5 text-primary" />
+            </div>
+            <h2 className="text-xl font-semibold">Micro-Kernel Architecture</h2>
+          </div>
+          <p className="text-muted-foreground mb-4">
+            The DNS resolver is built on a minimal kernel that delegates functionality to plugins.
+            This design allows for maximum flexibility and customization while keeping the core
+            lightweight and maintainable.
+          </p>
+          <div className="flex flex-wrap gap-2">
+            {['Modular', 'Extensible', 'Testable', 'Maintainable'].map((tag) => (
+              <span
+                key={tag}
+                className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-primary/10 text-primary text-sm"
+              >
+                <Check className="w-3 h-3" />
+                {tag}
+              </span>
+            ))}
+          </div>
+        </section>
+
+        {/* Core Plugins */}
+        <section className="mb-16">
+          <h2 className="text-2xl font-bold mb-6">Core Plugins</h2>
+          <p className="text-muted-foreground mb-6">
+            These plugins are automatically loaded by the resolver and provide essential functionality.
+          </p>
+          <div className="space-y-6">
+            {CORE_PLUGINS.map((plugin) => (
+              <div
+                key={plugin.name}
+                className={cn(
+                  'rounded-xl border border-border bg-card p-6',
+                  'hover:border-primary/50 transition-colors'
+                )}
+              >
+                <div className="flex items-center gap-2 mb-2">
+                  <Plug className="w-4 h-4 text-primary" />
+                  <h3 className="font-semibold font-mono">{plugin.name}</h3>
+                  <span className="px-2 py-0.5 rounded bg-green-500/10 text-green-600 dark:text-green-400 text-xs">
+                    Core
+                  </span>
+                </div>
+                <p className="text-sm text-muted-foreground mb-4">{plugin.description}</p>
+                <CodeBlock code={plugin.code} language="typescript" showLineNumbers={false} />
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* Optional Plugins */}
+        <section className="mb-16">
+          <h2 className="text-2xl font-bold mb-6">Optional Plugins</h2>
+          <p className="text-muted-foreground mb-6">
+            Enable these plugins as needed for additional functionality.
+          </p>
+          <div className="grid gap-6 sm:grid-cols-2">
+            {OPTIONAL_PLUGINS.map((plugin) => (
+              <div
+                key={plugin.name}
+                className={cn(
+                  'rounded-xl border border-border bg-card p-6',
+                  'hover:border-primary/50 transition-colors'
+                )}
+              >
+                <div className="flex items-center gap-2 mb-2">
+                  <Plug className="w-4 h-4 text-muted-foreground" />
+                  <h3 className="font-semibold font-mono">{plugin.name}</h3>
+                </div>
+                <p className="text-sm text-muted-foreground mb-4">{plugin.description}</p>
+                <CodeBlock
+                  code={plugin.code}
+                  language="typescript"
+                  showLineNumbers={false}
+                  className="text-xs"
+                />
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* Custom Plugins */}
+        <section className="mb-16">
+          <h2 className="text-2xl font-bold mb-6">Creating Custom Plugins</h2>
+          <p className="text-muted-foreground mb-6">
+            Create your own plugins to extend @oxog/dns with custom functionality.
+          </p>
+          <CodeBlock code={CUSTOM_PLUGIN_CODE} language="typescript" filename="my-plugin.ts" />
+        </section>
+
+        {/* Plugin Lifecycle */}
+        <section>
+          <h2 className="text-2xl font-bold mb-6">Plugin Lifecycle</h2>
+          <p className="text-muted-foreground mb-6">
+            Understanding the plugin lifecycle helps you write efficient plugins.
+          </p>
+          <CodeBlock code={LIFECYCLE_CODE} language="typescript" filename="lifecycle.ts" />
         </section>
       </div>
     </div>
