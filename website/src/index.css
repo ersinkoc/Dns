@@ -1,0 +1,84 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 220 10% 8%;
+    --foreground: 210 20% 95%;
+    --card: 220 15% 12%;
+    --card-foreground: 210 20% 95%;
+    --border: 220 15% 18%;
+    --primary: 210 100% 65%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 220 15% 18%;
+    --muted: 220 15% 18%;
+    --accent: 220 15% 20%;
+  }
+
+  .light {
+    --background: 0 0% 100%;
+    --foreground: 220 10% 8%;
+    --card: 0 0% 100%;
+    --card-foreground: 220 10% 8%;
+    --border: 220 15% 90%;
+    --primary: 210 100% 50%;
+    --secondary: 220 15% 95%;
+    --muted: 220 15% 95%;
+    --accent: 220 15% 92%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+}
+
+/* IDE-style code blocks */
+.code-block {
+  @apply relative my-4 overflow-hidden rounded-lg border border-border bg-accent;
+}
+
+.code-header {
+  @apply flex items-center justify-between border-b border-border px-4 py-2 text-sm text-muted-foreground;
+}
+
+.code-content {
+  @apply overflow-x-auto p-4 text-sm;
+}
+
+.code-content pre {
+  @apply m-0;
+}
+
+.code-content code {
+  @apply font-mono;
+}
+
+.line-numbers {
+  @apply mr-4 select-none text-muted-foreground/50;
+}
+
+/* Copy button */
+.copy-button {
+  @apply rounded px-2 py-1 text-xs font-medium transition-colors;
+  @apply hover:bg-primary/10 hover:text-primary;
+  @call active:scale-95;
+}
+
+/* Theme toggle */
+.theme-toggle {
+  @apply rounded-full p-2 transition-colors;
+  @apply hover:bg-accent;
+}
+
+/* Footer links */
+.footer-link {
+  @apply text-muted-foreground transition-colors hover:text-foreground;
+}

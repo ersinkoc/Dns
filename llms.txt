@@ -1,0 +1,116 @@
+# @oxog/dns
+
+> Zero-dependency DNS lookup library with DoH, caching, and DNSSEC validation
+
+## Install
+
+```bash
+npm install @oxog/dns
+```
+
+## Basic Usage
+
+```typescript
+import { dns } from '@oxog/dns';
+
+// Simple A record lookup
+const records = await dns.resolve('example.com', 'A');
+console.log(records); // ['93.184.216.34']
+
+// Create custom resolver
+const resolver = dns.createResolver({
+  servers: ['8.8.8.8', '1.1.1.1'],
+  cache: { enabled: true }
+});
+
+const result = await resolver.resolve('example.com', 'MX');
+console.log(result.records);
+```
+
+## API Summary
+
+### Main API
+
+- `dns.resolve(domain, type, options?)` - Query DNS records
+- `dns.reverse(ip)` - Reverse DNS lookup
+- `dns.createResolver(options?)` - Create custom resolver
+- `createResolver(options?)` - Create resolver instance
+
+### Core Plugins
+
+- `record-parser` - Parse DNS wire format
+- `resolver-chain` - Manage resolver selection
+- `query-builder` - Build DNS queries
+
+### Optional Plugins
+
+- `cache` - TTL-aware caching
+- `doh` - DNS-over-HTTPS
+- `dnssec` - DNSSEC validation
+- `retry` - Automatic retry with backoff
+- `metrics` - Query statistics
+- `logger` - Query/response logging
+
+## Common Patterns
+
+### Multiple Record Types
+
+```typescript
+const a = await dns.resolve('example.com', 'A');
+const mx = await dns.resolve('example.com', 'MX');
+const txt = await dns.resolve('example.com', 'TXT');
+```
+
+### DNS-over-HTTPS
+
+```typescript
+const resolver = dns.createResolver({
+  type: 'doh',
+  server: 'https://1.1.1.1/dns-query'
+});
+
+await resolver.resolve('example.com', 'A');
+```
+
+### With Caching
+
+```typescript
+const resolver = dns.createResolver({
+  cache: { enabled: true, maxSize: 1000 }
+});
+
+await resolver.resolve('example.com', 'A');
+```
+
+### Reverse Lookup
+
+```typescript
+const hostname = await dns.reverse('8.8.8.8');
+console.log(hostname); // 'dns.google'
+```
+
+## Errors
+
+| Code | Meaning | Solution |
+|------|---------|----------|
+| `NXDOMAIN` | Domain does not exist | Check domain spelling |
+| `TIMEOUT` | Query timed out | Increase timeout or check connectivity |
+| `SERVFAIL` | Server failed to respond | Try different resolver |
+| `DNSSEC_INVALID` | DNSSEC validation failed | Check domain DNSSEC config |
+
+## Record Types
+
+- `A` - IPv4 address
+- `AAAA` - IPv6 address
+- `MX` - Mail server
+- `TXT` - Text record
+- `CNAME` - Alias
+- `NS` - Nameserver
+- `SRV` - Service record
+- `SOA` - Zone authority
+- `CAA` - Certificate authority
+
+## Links
+
+- Docs: https://dns.oxog.dev
+- GitHub: https://github.com/ersinkoc/dns
