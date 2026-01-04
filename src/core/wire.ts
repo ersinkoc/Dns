@@ -53,6 +53,7 @@ export function encodeName(name: string, compression?: Map<string, number>): Buf
     const currentPos = buffers.reduce((sum, buf) => sum + buf.length, 0) + (i === 0 ? 0 : 2);
 
     // Encode label length and label
+    /* v8 ignore next */
     const labelBuffer = Buffer.from(label ?? '', 'latin1');
     if (labelBuffer.length > 63) {
       throw new ValidationError(`Label too long: ${label}`, label);

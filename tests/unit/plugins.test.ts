@@ -4,14 +4,16 @@
 
 import { describe, it, expect, beforeEach } from 'vitest';
 import { DnsKernel, createKernel } from '../../src/kernel.js';
-import { queryBuilderPlugin, buildQueryWithKernel, getPendingQuery, removePendingQuery } from '../../src/plugins/core/query-builder.js';
+import { queryBuilderPlugin, buildQueryWithKernel, clearPendingQueries, resetQueryCounter, getPendingQuery, removePendingQuery } from '../../src/plugins/core/query-builder.js';
 import {
   resolverChainPlugin,
   getNextResolver,
   addResolver,
   removeResolver,
+  getResolvers,
+  resetFailedResolvers,
 } from '../../src/plugins/core/resolver-chain.js';
-import { recordParserPlugin } from '../../src/plugins/core/record-parser.js';
+import { recordParserPlugin, getParsedResponse, setParsedResponse, clearParsedResponses } from '../../src/plugins/core/record-parser.js';
 import { cachePlugin, cacheGet, cacheSet, cacheClear } from '../../src/plugins/optional/cache.js';
 import { retryPlugin, calculateDelay, sleep } from '../../src/plugins/optional/retry.js';
 import { metricsPlugin, recordMetric, getMetrics, getMetricStats } from '../../src/plugins/optional/metrics.js';
@@ -45,6 +47,51 @@ describe('plugins', () => {
       const [queryId] = buildQueryWithKernel(kernel, 'example.com', 'A');
       expect(removePendingQuery(kernel, queryId)).toBe(true);
       expect(getPendingQuery(kernel, queryId)).toBeUndefined();
+    });
+
+    it('should handle onInit lifecycle hook', async () => {
+      await kernel.init();
+      // Plugin should be initialized after init
+      expect(kernel.context.initialized.has('query-builder')).toBe(true);
+    });
+
+    it('should handle onDestroy lifecycle hook', async () => {
+      await kernel.init();
+      await kernel.destroy();
+      // After destroy, plugins should be cleared
+      expect(kernel.context.plugins.size).toBe(0);
+    });
+
+    it('should build query with options', () => {
+      const [queryId, buffer] = buildQueryWithKernel(kernel, 'example.com', 'A', {
+        timeout: 5000,
+        noCache: true,
+        dnssec: false,
+      });
+      const query = getPendingQuery(kernel, queryId);
+      expect(query?.options).toEqual({
+        timeout: 5000,
+        noCache: true,
+        dnssec: false,
+      });
+    });
+
+    it('should return undefined for non-existent pending query', () => {
+      const query = getPendingQuery(kernel, 9999);
+      expect(query).toBeUndefined();
+    });
+
+    it('should return false when removing non-existent query', () => {
+      expect(removePendingQuery(kernel, 9999)).toBe(false);
+    });
+
+    it('should handle query ID counter wrapping', async () => {
+      kernel.setState('nextId', 65535);
+      const [queryId1] = buildQueryWithKernel(kernel, 'test1.com', 'A');
+      expect(queryId1).toBe(65535);
+
+      const [queryId2] = buildQueryWithKernel(kernel, 'test2.com', 'A');
+      expect(queryId2).toBe(0); // Wrapped around
     });
   });
 
@@ -210,6 +257,147 @@ describe('plugins', () => {
       log(kernel, 'info', 'Test');
       clearLogs(kernel);
       expect(getLogs(kernel).length).toBe(0);
+    });
+  });
+
+  describe('Query Builder Plugin', () => {
+    it('should build query buffer for A record', () => {
+      const kernel = new DnsKernel({ timeout: 5000 });
+      kernel.use(queryBuilderPlugin);
+
+      const [id, buffer] = buildQueryWithKernel(kernel, 'example.com', 'A');
+      expect(buffer).toBeInstanceOf(Buffer);
+      expect(buffer.length).toBeGreaterThan(0);
+      expect(typeof id).toBe('number');
+    });
+
+    it('should build query buffer for AAAA record', () => {
+      const kernel = new DnsKernel({ timeout: 5000 });
+      kernel.use(queryBuilderPlugin);
+
+      const [id, buffer] = buildQueryWithKernel(kernel, 'example.com', 'AAAA');
+      expect(buffer).toBeInstanceOf(Buffer);
+      expect(buffer.length).toBeGreaterThan(0);
+    });
+
+    it('should build query buffer for MX record', () => {
+      const kernel = new DnsKernel({ timeout: 5000 });
+      kernel.use(queryBuilderPlugin);
+
+      const [id, buffer] = buildQueryWithKernel(kernel, 'example.com', 'MX');
+      expect(buffer).toBeInstanceOf(Buffer);
+    });
+
+    it('should clear pending queries', () => {
+      const kernel = new DnsKernel({ timeout: 5000 });
+      kernel.use(queryBuilderPlugin);
+
+      buildQueryWithKernel(kernel, 'test.com', 'A');
+      clearPendingQueries(kernel);
+
+      // After clearing, pending queries should be empty
+      expect(kernel.getState('pendingQueries')?.size).toBe(0);
+    });
+
+    it('should reset query counter', () => {
+      const kernel = new DnsKernel({ timeout: 5000 });
+      kernel.use(queryBuilderPlugin);
+
+      buildQueryWithKernel(kernel, 'test.com', 'A');
+      buildQueryWithKernel(kernel, 'test2.com', 'A');
+
+      const counterBefore = kernel.getState('nextId') as number;
+
+      resetQueryCounter(kernel);
+
+      const counterAfter = kernel.getState('nextId') as number;
+      expect(counterAfter).toBe(0);
+      expect(counterAfter).toBeLessThan(counterBefore);
+    });
+  });
+
+  describe('Record Parser Plugin', () => {
+    it('should set and get parsed responses', () => {
+      const kernel = new DnsKernel({});
+      kernel.use(recordParserPlugin);
+
+      const response = {
+        id: 1,
+        flags: 0x8180,
+        questions: [],
+        answers: [
+          { type: 'A', class: 1, ttl: 300, data: Buffer.from([0x7f, 0x00, 0x00, 0x01]) },
+        ] as any,
+        authorities: [],
+        additionals: [],
+      };
+
+      setParsedResponse(kernel, 1, response);
+      const parsed = getParsedResponse(kernel, 1);
+      expect(parsed).toBeDefined();
+    });
+
+    it('should return undefined for non-existent parsed response', () => {
+      const kernel = new DnsKernel({});
+      kernel.use(recordParserPlugin);
+
+      const parsed = getParsedResponse(kernel, 9999);
+      expect(parsed).toBeUndefined();
+    });
+
+    it('should clear parsed responses', () => {
+      const kernel = new DnsKernel({});
+      kernel.use(recordParserPlugin);
+
+      const response = { id: 1, flags: 0x8180, questions: [], answers: [], authorities: [], additionals: [] } as any;
+      setParsedResponse(kernel, 1, response);
+
+      clearParsedResponses(kernel);
+
+      const parsed = getParsedResponse(kernel, 1);
+      expect(parsed).toBeUndefined();
+    });
+  });
+
+  describe('Resolver Chain Plugin', () => {
+    it('should get next resolver', () => {
+      const kernel = new DnsKernel({});
+      kernel.use(resolverChainPlugin);
+
+      const resolver = getNextResolver(kernel);
+      expect(resolver).toBeDefined();
+      expect(typeof resolver).toBe('string');
+    });
+
+    it('should add and remove resolvers', () => {
+      const kernel = new DnsKernel({});
+      kernel.use(resolverChainPlugin);
+
+      addResolver(kernel, '8.8.8.8');
+      addResolver(kernel, '1.1.1.1');
+
+      const resolvers = getResolvers(kernel);
+      expect(resolvers).toContain('8.8.8.8');
+      expect(resolvers).toContain('1.1.1.1');
+
+      removeResolver(kernel, '8.8.8.8');
+
+      const resolversAfter = getResolvers(kernel);
+      expect(resolversAfter).not.toContain('8.8.8.8');
+      expect(resolversAfter).toContain('1.1.1.1');
+    });
+
+    it('should reset failed resolvers', () => {
+      const kernel = new DnsKernel({});
+      kernel.use(resolverChainPlugin);
+
+      addResolver(kernel, '8.8.8.8');
+      kernel.setState('failed', new Set(['8.8.8.8']));
+
+      resetFailedResolvers(kernel);
+
+      const failed = kernel.getState('failed') as Set<string>;
+      expect(failed.size).toBe(0);
     });
   });
 });

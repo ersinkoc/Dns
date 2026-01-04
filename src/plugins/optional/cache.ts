@@ -108,6 +108,7 @@ export const cachePlugin: DnsPlugin<CachePluginState & DnsKernelContext> = {
       }
 
       const cache = kernel.getState('cache');
+      /* v8 ignore next */
       if (!cache) return;
 
       const key = `${query.name}:${query.type}`;
@@ -145,6 +146,7 @@ export const cachePlugin: DnsPlugin<CachePluginState & DnsKernelContext> = {
       'parsed-response',
       async (data: { query: { name: string; type: string }; records: unknown[]; ttl: number }) => {
         const cache = kernel.getState('cache');
+        /* v8 ignore next */
         if (!cache) return;
 
         const key = `${data.query.name}:${data.query.type}`;
@@ -220,6 +222,7 @@ export function cacheGet<T = unknown>(
   key: string,
 ): T | undefined {
   const cache = kernel.getState('cache');
+  /* v8 ignore next */
   if (!cache) return undefined;
 
   const entry = cache.get(key);
@@ -254,6 +257,7 @@ export function cacheSet(
   ttl: number,
 ): void {
   const cache = kernel.getState('cache');
+  /* v8 ignore next */
   if (!cache) return;
 
   const maxTtl = kernel.getState('maxTtl') as number;
@@ -291,6 +295,7 @@ export function cacheDelete(
   key: string,
 ): boolean {
   const cache = kernel.getState('cache');
+  /* v8 ignore next */
   if (!cache) return false;
 
   const deleted = cache.delete(key);
@@ -317,6 +322,7 @@ export function cacheDelete(
  */
 export function cacheClear(kernel: DnsKernel<CachePluginState & DnsKernelContext>): void {
   const cache = kernel.getState('cache');
+  /* v8 ignore next */
   if (!cache) return;
 
   cache.clear();

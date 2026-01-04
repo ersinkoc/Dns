@@ -6,7 +6,7 @@
  * @module
  */
 
-import type { DnsPlugin, ResolverOptions } from '../../types.js';
+import type { DnsPlugin } from '../../types.js';
 import type { DnsKernelContext } from '../../kernel.js';
 import { DnsKernel } from '../../kernel.js';
 import { isValidHost } from '../../utils/ip.js';

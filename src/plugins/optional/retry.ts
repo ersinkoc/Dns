@@ -246,8 +246,11 @@ export async function withRetry<T>(
       // Wait before retry
       await sleep(delay);
     }
+    /* v8 ignore next */
   }
 
-  // Should never reach here
+  // This point is only reached if maxRetries is negative (which should not happen)
+  // but TypeScript requires a return/throw after the loop
+  /* v8 ignore next 2 */
   throw new Error('Retry logic failed');
 }

@@ -476,6 +476,7 @@ export type EventListener<T = unknown> = (data: T) => void | Promise<void>;
  * };
  * ```
  */
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export interface DnsPlugin<T = unknown> {
   /** Plugin name */
   name: string;

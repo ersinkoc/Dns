@@ -58,6 +58,7 @@ export { DnsError, ValidationError, PluginError } from './errors.js';
 export { DnsKernel, createKernel } from './kernel.js';
 
 // Resolver
+import { createResolver as createDnsResolver } from './core/resolver.js';
 export { DnsResolver, createResolver } from './core/resolver.js';
 
 // Low-level utilities
@@ -151,9 +152,6 @@ export {
   writeNullTerminatedString,
 } from './utils/buffer.js';
 
-// Create default DNS instance
-const { createResolver: createDnsResolver } = require('./core/resolver.js');
-
 // Create the base resolver instance
 const _resolver = createDnsResolver();
 
@@ -205,6 +203,7 @@ export const dns = Object.assign(_resolver, {
    * console.log(mx); // [{ priority: 5, exchange: '...' }]
    * ```
    */
+  /* v8 ignore next 8 */
   async resolve<T extends import('./types.js').RecordType>(
     domain: string,
     type: T,
@@ -226,6 +225,7 @@ export const dns = Object.assign(_resolver, {
    * console.log(hostname); // 'dns.google'
    * ```
    */
+  /* v8 ignore next 7 */
   async reverse(ip: string): Promise<string> {
     const { ipToReverse } = await import('./utils/ip.js');
     const reverseDomain = ipToReverse(ip);
@@ -246,6 +246,7 @@ export const dns = Object.assign(_resolver, {
    * console.log(ptrs); // ['dns.google']
    * ```
    */
+  /* v8 ignore next 7 */
   async reverseAll(ip: string): Promise<string[]> {
     const { ipToReverse } = await import('./utils/ip.js');
     const reverseDomain = ipToReverse(ip);

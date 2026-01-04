@@ -14,41 +14,40 @@ export function Playground() {
     setResult(null);
 
     try {
-      // In a real implementation, this would call the actual API
-      // For the playground, we'll simulate the response
-      await new Promise((resolve) => setTimeout(resolve, 500));
+      // Use Cloudflare DNS-over-HTTPS API for real DNS queries
+      const dohUrl = `https://cloudflare-dns.com/dns-query?name=${encodeURIComponent(domain)}&type=${recordType}`;
 
-      const responses: Record<string, Record<'A' | 'AAAA' | 'MX' | 'TXT' | 'CNAME' | 'NS', string[]>> = {
-        'example.com': {
-          'A': ['93.184.216.34'],
-          'AAAA': ['2606:2800:220:1:248:1893:25c8:1946'],
-          'MX': [],
-          'TXT': ['v=spf1 -all'],
-          'CNAME': [],
-          'NS': ['a.iana-servers.net', 'b.iana-servers.net'],
+      const response = await fetch(dohUrl, {
+        headers: {
+          'Accept': 'application/dns-json',
         },
-        'google.com': {
-          'A': ['142.250.185.46'],
-          'AAAA': ['2607:f8b0:4004:800::200e'],
-          'MX': [{ priority: 10, exchange: 'smtp.google.com' }].map(String),
-          'TXT': ['v=spf1 include:_spf.google.com ~all'],
-          'CNAME': [],
-          'NS': ['ns1.google.com', 'ns2.google.com', 'ns3.google.com', 'ns4.google.com'],
-        },
-        'gmail.com': {
-          'A': ['142.250.185.229'],
-          'AAAA': ['2607:f8b0:4004:801::2005'],
-          'MX': [{ priority: 5, exchange: 'gmail-smtp-in.l.google.com' },
-                 { priority: 10, exchange: 'alt1.gmail-smtp-in.l.google.com' },
-                 { priority: 20, exchange: 'alt2.gmail-smtp-in.l.google.com' }].map(String),
-          'TXT': ['v=spf1 include:_spf.google.com ~all'],
-          'CNAME': [],
-          'NS': ['ns1.google.com', 'ns2.google.com', 'ns3.google.com', 'ns4.google.com'],
-        },
-      };
+      });
 
-      const records = responses[domain]?.[recordType] ?? [];
-      setResult(JSON.stringify(records, null, 2));
+      if (!response.ok) {
+        throw new Error(`DNS query failed: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+
+      // Extract answers from the response
+      const answers = data.Answer || [];
+
+      // Format the response
+      const formatted = answers.map((record: any) => {
+        if (record.type === 1) return record.data; // A
+        if (record.type === 28) return record.data; // AAAA
+        if (record.type === 5) return record.data; // CNAME
+        if (record.type === 2) return record.data; // NS
+        if (record.type === 15) return `${record.data.priority} ${record.data.exchange}`; // MX
+        if (record.type === 16) return record.data; // TXT (base64 encoded)
+        return JSON.stringify(record.data);
+      });
+
+      if (formatted.length === 0) {
+        setResult('[]');
+      } else {
+        setResult(JSON.stringify(formatted, null, 2));
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unknown error');
     } finally {
@@ -60,7 +59,7 @@ export function Playground() {
     <div className="mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:px-8">
       <h1 className="text-3xl font-bold">DNS Playground</h1>
       <p className="mt-2 text-muted-foreground">
-        Try out DNS queries interactively. (Demo - not connected to real DNS)
+        Try out real DNS queries using Cloudflare's DNS-over-HTTPS API.
       </p>
 
       <div className="mt-8 rounded-lg border border-border bg-card p-6">

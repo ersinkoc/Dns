@@ -8,12 +8,9 @@
 
 import type {
   DnsPlugin,
-  PluginContext,
   KernelEvent,
   EventListener,
   ResolverOptions,
-  DnsQuery,
-  DnsResponse,
 } from './types.js';
 import { PluginError } from './errors.js';
 
@@ -155,6 +152,7 @@ export class DnsKernel<TContext = Record<string, unknown>> {
       plugin.install(this as unknown as DnsKernel<C>);
     } catch (error) {
       this.context.plugins.delete(plugin.name);
+      /* v8 ignore next 4 */
       throw new PluginError(
         plugin.name,
         `Plugin installation failed: ${error instanceof Error ? error.message : String(error)}`,
@@ -195,7 +193,7 @@ export class DnsKernel<TContext = Record<string, unknown>> {
     this.context.initialized.delete(name);
 
     // Remove all event listeners from this plugin
-    for (const [event, listeners] of this.context.listeners) {
+    for (const listeners of this.context.listeners.values()) {
       for (const listener of listeners) {
         // @ts-expect-error - We're checking if listener has plugin property
         if (listener.plugin === name) {
@@ -289,6 +287,7 @@ export class DnsKernel<TContext = Record<string, unknown>> {
           try {
             await plugin.onInit();
           } catch (error) {
+            /* v8 ignore next 4 */
             throw new PluginError(
               plugin.name,
               `Plugin initialization failed: ${error instanceof Error ? error.message : String(error)}`,

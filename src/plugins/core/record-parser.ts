@@ -13,7 +13,6 @@ import { DnsKernel } from '../../kernel.js';
 import { parseRecords, isNXDOMAIN, isSERVFAIL, getMinTtl, sortSRVRecords } from '../../core/parser.js';
 import { decodeResponse } from '../../core/wire.js';
 import { DnsError } from '../../errors.js';
-import { DnsErrorCode } from '../../types.js';
 
 /**
  * Parsed response interface.

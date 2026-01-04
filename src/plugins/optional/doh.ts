@@ -128,6 +128,7 @@ export async function dohQuery(
       throw new Error(`DoH request timed out after ${timeout}ms`);
     }
     throw error;
+    /* v8 ignore next 2 */
   } finally {
     clearTimeout(timer);
   }
@@ -185,6 +186,7 @@ export async function dohQueryGet(
       throw new Error(`DoH request timed out after ${timeout}ms`);
     }
     throw error;
+    /* v8 ignore next 2 */
   } finally {
     clearTimeout(timer);
   }

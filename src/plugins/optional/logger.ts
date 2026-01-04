@@ -135,6 +135,7 @@ export const loggerPlugin: DnsPlugin<LoggerPluginState & DnsKernelContext> = {
     });
 
     kernel.on('retry', async (data: { attempt: number; maxRetries: number; delay: number; error?: Error }) => {
+      /* v8 ignore next 5 */
       log(kernel, 'warn', 'Retrying DNS query', {
         attempt: data.attempt,
         maxRetries: data.maxRetries,

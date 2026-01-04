@@ -136,10 +136,9 @@ export const dnssecPlugin: DnsPlugin<DnssecPluginState & DnsKernelContext> = {
  */
 export async function validateDnssec(
   kernel: DnsKernel<DnssecPluginState & DnsKernelContext>,
-  domain: string,
+  _domain: string,
 ): Promise<DnssecResult> {
   const enabled = kernel.getState('enabled') as boolean;
-  const trustAnchors = kernel.getState('trustAnchors') as string[];
 
   if (!enabled) {
     return { secure: false, reason: 'dnssec-disabled' };

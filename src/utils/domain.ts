@@ -51,9 +51,10 @@ export function isValidDomain(domain: string): boolean {
     return false;
   }
 
-  // Check each label length
+  // Check each label length (defensive check - regex already limits to 63 chars)
   const labels = domain.split('.');
   for (const label of labels) {
+    /* v8 ignore next 3 */
     if (label.length > MAX_LABEL_LENGTH) {
       return false;
     }
