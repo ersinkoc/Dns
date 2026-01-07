@@ -31,24 +31,14 @@ export function InstallTabs({ className }: InstallTabsProps) {
   const command = COMMANDS[activeTab];
 
   return (
-    <div
-      className={cn(
-        'rounded-xl overflow-hidden border border-zinc-800/60 bg-zinc-900/60 backdrop-blur-sm',
-        className
-      )}
-    >
+    <div className={cn('install-tabs', className)}>
       {/* Tabs */}
-      <div className="flex border-b border-zinc-800/60 bg-zinc-900/40">
+      <div className="install-tabs-header">
         {TABS.map((tab) => (
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
-            className={cn(
-              'px-4 py-2.5 text-sm font-medium transition-colors',
-              activeTab === tab.id
-                ? 'text-zinc-100 bg-zinc-800/50 border-b-2 border-indigo-500 -mb-px'
-                : 'text-zinc-500 hover:text-zinc-300'
-            )}
+            className={cn('install-tab', activeTab === tab.id && 'active')}
           >
             {tab.label}
           </button>
@@ -56,19 +46,17 @@ export function InstallTabs({ className }: InstallTabsProps) {
       </div>
 
       {/* Command */}
-      <div className="flex items-center justify-between p-4">
-        <code className="text-sm font-mono text-zinc-200">{command}</code>
+      <div className="install-command">
+        <code>
+          {command}
+        </code>
         <button
           onClick={() => copy(command)}
-          className={cn(
-            'flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm',
-            'text-zinc-500 hover:text-zinc-200',
-            'hover:bg-zinc-800/50 transition-colors'
-          )}
+          className="p-1.5 rounded hover:bg-secondary text-muted-foreground hover:text-foreground transition-colors"
           aria-label="Copy command"
         >
           {copied ? (
-            <Check className="w-4 h-4 text-green-400" />
+            <Check className="w-4 h-4 text-green-500" />
           ) : (
             <Copy className="w-4 h-4" />
           )}

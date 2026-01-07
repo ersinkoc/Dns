@@ -23,21 +23,37 @@ console.log(result.ttl); // 3600`;
 
 export function QuickExample() {
   return (
-    <section className="py-24 bg-zinc-950/50">
+    <section className="py-20">
       <div className="container mx-auto px-4">
-        <div className="max-w-4xl mx-auto">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl sm:text-4xl font-bold mb-4 text-white">Quick Start</h2>
-            <p className="text-lg text-zinc-400">
-              Get started with just a few lines of code.
+        <div className="max-w-3xl mx-auto">
+          {/* Header */}
+          <div className="text-center mb-8">
+            <h2 className="text-2xl sm:text-3xl font-bold mb-3 text-foreground">
+              Quick Start
+            </h2>
+            <p className="text-muted-foreground">
+              Create your first DNS lookup in seconds with our fluent builder API.
             </p>
           </div>
 
-          <div className="rounded-2xl overflow-hidden border border-zinc-800/60 bg-zinc-900/40 backdrop-blur-sm">
+          {/* Code block */}
+          <div className="code-container">
+            {/* Header bar */}
+            <div className="code-header">
+              <div className="code-dots">
+                <div className="code-dot code-dot-red" />
+                <div className="code-dot code-dot-yellow" />
+                <div className="code-dot code-dot-green" />
+              </div>
+              <span className="text-xs text-muted-foreground font-mono ml-2">
+                index.ts
+              </span>
+            </div>
+
+            {/* Code content */}
             <CodeBlock
               code={EXAMPLE_CODE}
               language="typescript"
-              filename="index.ts"
               highlightLines={[4, 8, 17]}
             />
           </div>

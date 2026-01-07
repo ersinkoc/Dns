@@ -1,6 +1,5 @@
 import { Zap, Shield, Database, Lock, Puzzle, FileCode } from 'lucide-react';
 import { FEATURES } from '@/lib/constants';
-import { cn } from '@/lib/utils';
 
 const ICON_MAP = {
   Zap,
@@ -13,39 +12,35 @@ const ICON_MAP = {
 
 export function Features() {
   return (
-    <section className="py-24 relative">
-      {/* Background gradient */}
-      <div className="absolute inset-0 -z-10 bg-zinc-950/50" />
-
+    <section className="py-20 section-alt">
       <div className="container mx-auto px-4">
-        <div className="text-center mb-16">
-          <h2 className="text-3xl sm:text-4xl font-bold mb-4 text-white">Why @oxog/dns?</h2>
-          <p className="text-lg text-zinc-400 max-w-2xl mx-auto">
-            A modern DNS library designed for performance, security, and developer experience.
+        <div className="text-center mb-12">
+          <h2 className="text-2xl sm:text-3xl font-bold mb-3 text-foreground">
+            Why {FEATURES[0] ? '@oxog/dns' : ''}?
+          </h2>
+          <p className="text-muted-foreground max-w-xl mx-auto">
+            Built for developers who value simplicity, type safety, and performance.
           </p>
         </div>
 
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 max-w-6xl mx-auto">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 max-w-4xl mx-auto">
           {FEATURES.map((feature) => {
             const Icon = ICON_MAP[feature.icon as keyof typeof ICON_MAP];
             return (
-              <div
-                key={feature.title}
-                className={cn(
-                  'group rounded-2xl p-6 feature-card',
-                  'bg-zinc-900/60 backdrop-blur-sm',
-                  'border border-zinc-800/80',
-                  'hover:border-indigo-500/40 hover:bg-zinc-900/80',
-                  'transition-all duration-300'
-                )}
-              >
-                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-indigo-500/10 border border-indigo-500/20 group-hover:bg-indigo-500/20 group-hover:border-indigo-500/30 transition-all">
-                  <Icon className="h-6 w-6 text-indigo-400" />
+              <div key={feature.title} className="feature-card group">
+                <div className="flex items-start gap-3">
+                  <div className="shrink-0 p-2 rounded-md bg-primary/10 text-primary group-hover:bg-primary/20 transition-colors">
+                    <Icon className="h-5 w-5" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-foreground mb-1">
+                      {feature.title}
+                    </h3>
+                    <p className="text-sm text-muted-foreground leading-relaxed">
+                      {feature.description}
+                    </p>
+                  </div>
                 </div>
-                <h3 className="mb-2 text-lg font-semibold text-zinc-100">{feature.title}</h3>
-                <p className="text-sm text-zinc-400 leading-relaxed">
-                  {feature.description}
-                </p>
               </div>
             );
           })}

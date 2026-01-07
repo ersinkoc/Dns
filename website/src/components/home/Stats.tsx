@@ -29,24 +29,23 @@ const STATS = [
 
 export function Stats() {
   return (
-    <section className="py-16 stats-section border-y border-zinc-800/60 bg-zinc-950/80">
+    <section className="py-12 section-divider border-y border-border">
       <div className="container mx-auto px-4">
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4 max-w-5xl mx-auto">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 max-w-4xl mx-auto">
           {STATS.map((stat) => {
             const Icon = stat.icon;
             return (
-              <div
-                key={stat.label}
-                className="text-center p-6 rounded-2xl bg-zinc-900/40 border border-zinc-800/50 hover:border-zinc-700/60 transition-colors"
-              >
-                <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-indigo-500/10 border border-indigo-500/20 mb-4">
-                  <Icon className="w-6 h-6 text-indigo-400" />
+              <div key={stat.label} className="stat-card">
+                <div className="inline-flex items-center justify-center w-10 h-10 rounded-md bg-primary/10 mb-3">
+                  <Icon className="w-5 h-5 text-primary" />
                 </div>
-                <div className="text-3xl font-bold bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent mb-1">
+                <div className="text-2xl font-bold text-gradient mb-1">
                   {stat.value}
                 </div>
-                <div className="font-semibold text-zinc-100 mb-1">{stat.label}</div>
-                <div className="text-sm text-zinc-500">
+                <div className="font-medium text-foreground text-sm">
+                  {stat.label}
+                </div>
+                <div className="text-xs text-muted-foreground mt-1">
                   {stat.description}
                 </div>
               </div>
