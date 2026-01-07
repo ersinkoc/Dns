@@ -29,6 +29,7 @@ interface CodeBlockProps {
   code: string;
   language?: string;
   title?: string;
+  filename?: string; // Alias for title
   showLineNumbers?: boolean;
   highlightLines?: number[];
   className?: string;
@@ -38,10 +39,13 @@ export function CodeBlock({
   code,
   language = 'typescript',
   title,
+  filename,
   showLineNumbers = true,
   highlightLines = [],
   className,
 }: CodeBlockProps) {
+  // Use filename as fallback for title
+  const displayTitle = title || filename;
   const { resolvedTheme: siteTheme } = useTheme();
   const [copied, setCopied] = useState(false);
   const [html, setHtml] = useState<string>('');
@@ -95,7 +99,7 @@ export function CodeBlock({
       className
     )}>
       {/* Header */}
-      {title && (
+      {displayTitle && (
         <div className={cn(
           'flex items-center justify-between border-b px-4 py-2',
           isLightTheme
@@ -111,7 +115,7 @@ export function CodeBlock({
             <span className={cn(
               'ml-2 text-xs font-mono',
               isLightTheme ? 'text-gray-600' : 'text-gray-400'
-            )}>{title}</span>
+            )}>{displayTitle}</span>
           </div>
           <div className="flex items-center gap-2">
             <span className={cn(
